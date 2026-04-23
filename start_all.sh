@@ -19,6 +19,8 @@ BACKEND_HOST="0.0.0.0"
 BACKEND_PORT="8000"
 FRONTEND_HOST="0.0.0.0"
 FRONTEND_PORT="5173"
+PUBLIC_HOST="${PUBLIC_HOST:-$(hostname -I | awk '{print $1}') }"
+PUBLIC_HOST="${PUBLIC_HOST// /}"
 
 mkdir -p "$RUN_DIR" "$LOG_DIR"
 
@@ -85,8 +87,12 @@ fi
 echo "[3/3] Starting frontend..."
 cd "$FRONTEND_DIR"
 
+if [[ -z "$PUBLIC_HOST" ]]; then
+  PUBLIC_HOST="localhost"
+fi
+
 cat > .env <<EOF
-VITE_API_URL=http://localhost:${BACKEND_PORT}
+VITE_API_URL=http://${PUBLIC_HOST}:${BACKEND_PORT}
 EOF
 
 if [[ ! -d "node_modules" ]]; then
@@ -104,7 +110,7 @@ fi
 
 echo
 echo "Services are starting in background."
-echo "Backend:  http://localhost:${BACKEND_PORT}"
-echo "Frontend: http://localhost:${FRONTEND_PORT}"
+echo "Backend:  http://${PUBLIC_HOST}:${BACKEND_PORT}"
+echo "Frontend: http://${PUBLIC_HOST}:${FRONTEND_PORT}"
 echo "Backend log:  $BACKEND_LOG"
 echo "Frontend log: $FRONTEND_LOG"

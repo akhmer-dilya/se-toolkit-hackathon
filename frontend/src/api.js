@@ -1,4 +1,9 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+const inferredApiUrl =
+  typeof window !== 'undefined'
+    ? `${window.location.protocol}//${window.location.hostname}:8000`
+    : 'http://localhost:8000'
+
+const API_URL = import.meta.env.VITE_API_URL || inferredApiUrl
 
 async function request(path, options = {}, token) {
   const headers = {
@@ -10,10 +15,15 @@ async function request(path, options = {}, token) {
     headers.Authorization = `Bearer ${token}`
   }
 
-  const response = await fetch(`${API_URL}${path}`, {
-    ...options,
-    headers,
-  })
+  let response
+  try {
+    response = await fetch(`${API_URL}${path}`, {
+      ...options,
+      headers,
+    })
+  } catch {
+    throw new Error(`Cannot reach API at ${API_URL}. Check backend server and network/firewall.`)
+  }
 
   if (!response.ok) {
     const text = await response.text()
