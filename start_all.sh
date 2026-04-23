@@ -72,6 +72,10 @@ fi
 
 "$BACKEND_DIR/.venv/bin/python" -m pip install --upgrade pip >/dev/null
 "$BACKEND_DIR/.venv/bin/pip" install -r requirements.txt >/dev/null
+mkdir -p "$BACKEND_DIR/uploads"
+
+echo "Applying database migrations..."
+(cd "$BACKEND_DIR" && "$BACKEND_DIR/.venv/bin/alembic" upgrade head)
 
 if is_service_running_from_pid_file "$BACKEND_PID_FILE"; then
   echo "Backend already running (pid $(cat "$BACKEND_PID_FILE"))."

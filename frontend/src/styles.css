@@ -98,7 +98,7 @@ h3 {
 
 .tabs {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 0.5rem;
   margin: 1rem 0;
 }
@@ -139,12 +139,53 @@ label {
 }
 
 input,
-textarea {
+textarea,
+select {
   border-radius: 10px;
   border: 1px solid var(--line);
   padding: 0.6rem 0.7rem;
   font: inherit;
   background: #fffef8;
+}
+
+.subgrid {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.pill {
+  margin: 0;
+  font-size: 0.9rem;
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  padding: 0.55rem;
+  background: #fff;
+}
+
+.profile-head {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+}
+
+.avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(16, 37, 66, 0.2);
+}
+
+.left-column {
+  display: grid;
+  gap: 0.8rem;
+  align-content: start;
+}
+
+.right-column {
+  display: grid;
+  gap: 0.8rem;
+  align-content: start;
 }
 
 textarea {
@@ -274,8 +315,80 @@ button:hover,
   padding: 0.9rem;
 }
 
+.group-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.group-pill {
+  background: #ffe8bf;
+  color: var(--ink);
+}
+
+.group-pill.active {
+  background: var(--accent-2);
+  color: white;
+}
+
+.chart-card {
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 16px;
+  padding: 0.7rem;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.bar-row {
+  display: grid;
+  grid-template-columns: 95px 1fr auto;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.bar-wrap {
+  height: 10px;
+  border-radius: 999px;
+  background: #f2f5ff;
+  border: 1px solid #d5def3;
+  overflow: hidden;
+}
+
+.bar {
+  height: 100%;
+  background: linear-gradient(90deg, #ff595e, #ffca3a);
+  transition: width 0.3s ease;
+}
+
+.analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.7rem;
+}
+
+.analytics-card {
+  background: rgba(255, 255, 255, 0.83);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 0.7rem;
+}
+
+.analytics-card h4 {
+  margin: 0;
+}
+
+.analytics-card p {
+  margin: 0.3rem 0 0;
+}
+
 @media (max-width: 860px) {
   .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tabs {
     grid-template-columns: 1fr;
   }
 

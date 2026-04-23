@@ -7,8 +7,11 @@ const API_URL = import.meta.env.VITE_API_URL || inferredApiUrl
 
 async function request(path, options = {}, token) {
   const headers = {
-    'Content-Type': 'application/json',
     ...(options.headers || {}),
+  }
+
+  if (!(options.body instanceof FormData)) {
+    headers['Content-Type'] = 'application/json'
   }
 
   if (token) {
@@ -25,30 +28,48 @@ async function request(path, options = {}, token) {
     throw new Error(`Cannot reach API at ${API_URL}. Check backend server and network/firewall.`)
   }
 
-  if (!response.ok) {
-    const text = await response.text()
-    let detail = 'Request failed'
-
+  const text = await response.text()
+  const payload = text ? (() => {
     try {
-      const parsed = JSON.parse(text)
-      detail = parsed.detail || detail
+      return JSON.parse(text)
     } catch {
-      detail = text || detail
+      return null
     }
+  })() : null
 
-    throw new Error(detail)
+  if (!response.ok) {
+    throw new Error(payload?.detail || text || 'Request failed')
   }
 
-  return response.json()
+  return payload
 }
 
 export const api = {
   register: (payload) => request('/auth/register', { method: 'POST', body: JSON.stringify(payload) }),
   login: (payload) => request('/auth/login', { method: 'POST', body: JSON.stringify(payload) }),
+  refresh: (payload) => request('/auth/refresh', { method: 'POST', body: JSON.stringify(payload) }),
+  logout: (payload, token) => request('/auth/logout', { method: 'POST', body: JSON.stringify(payload) }, token),
+  forgotPassword: (payload) => request('/auth/forgot-password', { method: 'POST', body: JSON.stringify(payload) }),
+  resetPassword: (payload) => request('/auth/reset-password', { method: 'POST', body: JSON.stringify(payload) }),
   me: (token) => request('/auth/me', {}, token),
+
+  updateProfile: (payload, token) => request('/profile', { method: 'PATCH', body: JSON.stringify(payload) }, token),
+  uploadAvatar: (file, token) => {
+    const formData = new FormData()
+    formData.append('file', file)
+    return request('/profile/avatar', { method: 'POST', body: formData }, token)
+  },
+
   listHabits: (token) => request('/habits', {}, token),
   createHabit: (payload, token) => request('/habits', { method: 'POST', body: JSON.stringify(payload) }, token),
   trackHabit: (habitId, payload, token) =>
     request(`/habits/${habitId}/records`, { method: 'POST', body: JSON.stringify(payload) }, token),
   listHabitRecords: (habitId, token) => request(`/habits/${habitId}/records`, {}, token),
+
+  createGroup: (payload, token) => request('/groups', { method: 'POST', body: JSON.stringify(payload) }, token),
+  joinGroup: (payload, token) => request('/groups/join', { method: 'POST', body: JSON.stringify(payload) }, token),
+  listGroups: (token) => request('/groups', {}, token),
+  groupLeaderboard: (groupId, token) => request(`/groups/${groupId}/leaderboard`, {}, token),
+
+  analyticsOverview: (token) => request('/analytics/overview', {}, token),
 }
