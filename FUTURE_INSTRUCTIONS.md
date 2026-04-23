@@ -22,12 +22,12 @@ When continuing this project, follow this order:
    - weekly completion chart
    - longest streak per habit
    - habit adherence percentage
-7. Add deployment setup:
-   - Dockerfile for backend and frontend
-   - production env examples
-   - CI pipeline for lint/test/build
+
+Important process note:
+- Update start_all.sh at every step so project startup stays one-command and aligned with latest changes.
 
 Implementation quality bar:
 - Keep backend endpoint contracts stable and documented in README.
+- Be very thorough with frontend implementation quality (UX, states, responsiveness, edge cases).
 - Keep frontend mobile-first and visually playful.
 - Keep commits small and focused per feature.
