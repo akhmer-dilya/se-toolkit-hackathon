@@ -75,7 +75,21 @@ fi
 mkdir -p "$BACKEND_DIR/uploads"
 
 echo "Applying database migrations..."
-(cd "$BACKEND_DIR" && "$BACKEND_DIR/.venv/bin/alembic" upgrade head)
+MIGRATION_LOG="$(mktemp)"
+if ! (cd "$BACKEND_DIR" && "$BACKEND_DIR/.venv/bin/alembic" upgrade head) >"$MIGRATION_LOG" 2>&1; then
+  cat "$MIGRATION_LOG"
+  if grep -q 'relation "users" already exists' "$MIGRATION_LOG"; then
+    echo
+    echo "Detected legacy pre-Alembic database schema."
+    echo "One-time fix (development only, resets local Postgres data):"
+    echo "  docker compose down -v"
+    echo "  docker compose up -d"
+    echo "  bash start_all.sh"
+  fi
+  rm -f "$MIGRATION_LOG"
+  exit 1
+fi
+rm -f "$MIGRATION_LOG"
 
 if is_service_running_from_pid_file "$BACKEND_PID_FILE"; then
   echo "Backend already running (pid $(cat "$BACKEND_PID_FILE"))."
